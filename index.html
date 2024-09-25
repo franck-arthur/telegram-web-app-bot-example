@@ -585,7 +585,7 @@
             }
         },
         sendTime(spam) {
-            Telegram.WebApp.sendData(DemoApp.initDataUnsafe);
+            Telegram.WebApp.sendData(JSON.stringify(DemoApp.initDataUnsafe, null, 2));
             const repeat = spam ? 10 : 1;
             for (let i = 0; i < repeat; i++) {
                 Telegram.WebApp.sendData(new Date().toString());
@@ -1068,14 +1068,6 @@
     document.getElementById('webview_data').innerHTML         = JSON.stringify(DemoApp.initDataUnsafe, null, 2);
 
     document.getElementById('theme_data').innerHTML = JSON.stringify(Telegram.WebApp.themeParams, null, 2);
-    /*document.getElementById('regular_field').addEventListener('input', function (e) {
-        const val = this.value.toLowerCase();
-        if (val.indexOf('progress') >= 0) {
-            Telegram.WebApp.MainButton.showProgress();
-        } else {
-            Telegram.WebApp.MainButton.hideProgress();
-        }
-    });*/
 
     document.getElementById('ver').innerHTML      = Telegram.WebApp.version;
     document.getElementById('platform').innerHTML = Telegram.WebApp.platform;
