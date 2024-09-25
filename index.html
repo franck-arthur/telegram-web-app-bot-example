@@ -364,21 +364,10 @@
 <body class="" style="visibility: hidden;">
 
 <section id="top_sect" class="second">
-    <button id="data_btn" onclick="DemoApp.sendTime(true);">Send current time to bot (x10)</button>
-    <div
-        class="input"
-        contenteditable="true"
-        data-placeholder="Input text in contenteditable field..."
-        id="text_field"
-    ></div>
-    <div id="peer_wrap" style="display:none">
-        <img id="peer_photo" class="chat_img" src="">
-        <span id="peer_name"></span>
-    </div>
+    <button id="main_btn" onclick="DemoApp.sendMessage('');">Send data</button>
+    <button id="data_btn" onclick="DemoApp.sendTime(false);">Send current time to bot</button>
 </section>
 
-<section>
-    <div id="btn_status" class="hint" style="display: none;"></div>
 
     <pre><code id="webview_data"></code></pre>
     <div class="hint">
@@ -386,6 +375,13 @@
         <span id="webview_data_status" class="status_need">Checking hash...</span>
     </div>
     <pre><code id="theme_data"></code></pre>
+    <div class="hint">
+        Theme params
+    </div>
+    <div class="hint">
+        Version: <span id="ver"></span>,
+        platform: <span id="platform"></span>
+    </div>
 </section>
 
 <div class="viewport-border"></div>
@@ -410,7 +406,7 @@
             document.body.style.visibility = ''
             Telegram.WebApp.ready()
             Telegram.WebApp.MainButton.setParams({
-                text      : 'Fermer',
+                text      : 'CLOSE WEBVIEW',
                 is_visible: true
             }).onClick(DemoApp.close)
             Telegram.WebApp.BackButton.onClick(function() {
@@ -424,8 +420,44 @@
             Telegram.WebApp.expand();
         },
         close() {
-            //Telegram.WebApp.sendData(DemoApp.initDataUnsafe);
             Telegram.WebApp.close();
+        },
+        toggleMainButton(el) {
+            const mainButton = Telegram.WebApp.MainButton;
+            if (mainButton.isVisible) {
+                mainButton.hide();
+                el.innerHTML = 'Show Main Button';
+            } else {
+                mainButton.show();
+                el.innerHTML = 'Hide Main Button';
+            }
+        },
+        toggleBackButton(el) {
+            if (DemoApp.BackButton.isVisible) {
+                DemoApp.BackButton.hide();
+                el.innerHTML = 'Show Back Button';
+            } else {
+                DemoApp.BackButton.show();
+                el.innerHTML = 'Hide Back Button';
+            }
+        },
+        toggleSettingsButton(el) {
+            if (DemoApp.SettingsButton.isVisible) {
+                DemoApp.SettingsButton.hide();
+                el.innerHTML = 'Show Settings Button';
+            } else {
+                DemoApp.SettingsButton.show();
+                el.innerHTML = 'Hide Settings Button';
+            }
+        },
+        toggleSwipeBehavior(el) {
+            if (Telegram.WebApp.isVerticalSwipesEnabled) {
+                Telegram.WebApp.disableVerticalSwipes();
+                el.innerHTML = 'Enable Vertical Swypes';
+            } else {
+                Telegram.WebApp.enableVerticalSwipes();
+                el.innerHTML = 'Disable Vertical Swypes';
+            }
         },
 
         // version to string Example: '6.9'
@@ -442,6 +474,85 @@
         },
 
         // actions
+        sendMessage(msg_id, with_webview) {
+            if (!DemoApp.initDataUnsafe.query_id) {
+                alert('WebViewQueryId not defined');
+                return;
+            }
+
+            document.querySelectorAll('button').forEach((btn) => btn.disabled = true);
+
+            const btn       = document.querySelector('#btn_status');
+            btn.textContent = 'Sending...';
+
+            DemoApp.apiRequest('sendMessage', {
+                msg_id      : msg_id || '',
+                with_webview: !DemoApp.initDataUnsafe.receiver && with_webview ? 1 : 0
+            }, function (result) {
+                document.querySelectorAll('button').forEach((btn) => btn.disabled = false);
+
+                if (result.response) {
+                    if (result.response.ok) {
+                        btn.textContent   = 'Message sent successfully!';
+                        btn.className     = 'ok';
+                        btn.style.display = 'block';
+                    } else {
+                        btn.textContent   = result.response.description;
+                        btn.className     = 'err';
+                        btn.style.display = 'block';
+                        alert(result.response.description);
+                    }
+                } else if (result.error) {
+                    btn.textContent   = result.error;
+                    btn.className     = 'err';
+                    btn.style.display = 'block';
+                    alert(result.error);
+                } else {
+                    btn.textContent   = 'Unknown error';
+                    btn.className     = 'err';
+                    btn.style.display = 'block';
+                    alert('Unknown error');
+                }
+            });
+        },
+        changeMenuButton(close) {
+            document.querySelectorAll('button').forEach((btn) => btn.disabled = true);
+            const btnStatus       = document.querySelector('#btn_status');
+            btnStatus.textContent = 'Changing button...';
+
+            DemoApp.apiRequest('changeMenuButton', {}, function (result) {
+                document.querySelectorAll('button').forEach((btn) => btn.disabled = false);
+
+                if (result.response) {
+                    if (result.response.ok) {
+                        btnStatus.textContent   = 'Button changed!';
+                        btnStatus.className     = 'ok';
+                        btnStatus.style.display = 'block';
+                        Telegram.WebApp.close();
+                    } else {
+                        btnStatus.textContent   = result.response.description;
+                        btnStatus.className     = 'err';
+                        btnStatus.style.display = 'block';
+                        alert(result.response.description);
+                    }
+                } else if (result.error) {
+                    btnStatus.textContent   = result.error;
+                    btnStatus.className     = 'err';
+                    btnStatus.style.display = 'block';
+                    alert(result.error);
+                } else {
+                    btnStatus.textContent   = 'Unknown error';
+                    btnStatus.className     = 'err';
+                    btnStatus.style.display = 'block';
+                    alert('Unknown error');
+                }
+            });
+            if (close) {
+                setTimeout(function () {
+                    Telegram.WebApp.close();
+                }, 50);
+            }
+        },
         checkInitData() {
             const webViewStatus = document.querySelector('#webview_data_status');
             if (DemoApp.initDataUnsafe.query_id &&
@@ -461,10 +572,31 @@
             }
         },
         sendTime(spam) {
+            Telegram.WebApp.sendData(DemoApp.initDataUnsafe);
             const repeat = spam ? 10 : 1;
             for (let i = 0; i < repeat; i++) {
                 Telegram.WebApp.sendData(new Date().toString());
             }
+        },
+        switchInlineQuery(query, chooseChat) {
+            if (chooseChat) {
+                const chatTypes = []
+                const types = ['users', 'bots', 'groups', 'channels'];
+                for (let i = 0; i < types.length; i++) {
+                    const el = document.getElementById('select-' + types[i]);
+                    if (el.checked) {
+                        chatTypes.push(types[i]);
+                    }
+                }
+
+                if (!chooseChatTypes.length) {
+                    return DemoApp.showAlert('Select chat types!');
+                }
+
+                Telegram.WebApp.switchInlineQuery(query, chatTypes)
+            }
+
+            Telegram.WebApp.switchInlineQuery(query, false)
         },
 
         // Alerts
@@ -503,8 +635,77 @@
                 }
             });
         },
+        showScanQrPopup: function (linksOnly) {
+            Telegram.WebApp.showScanQrPopup({
+                text: linksOnly ? 'with any link' : 'for test purposes'
+            }, function (text) {
+                if (linksOnly) {
+                    const lowerText = text.toString().toLowerCase();
+                    if (lowerText.substring(0, 7) === 'http://' ||
+                        lowerText.substring(0, 8) === 'https://'
+                    ) {
+                        setTimeout(function () {
+                            Telegram.WebApp.openLink(text);
+                        }, 50);
 
-        
+                        return true;
+                    }
+                } else {
+                    DemoApp.showAlert(text);
+
+                    return true;
+                }
+            });
+        },
+
+        // Permissions
+        requestLocation(el) {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    el.nextElementSibling.innerHTML = '(' + position.coords.latitude + ', ' + position.coords.longitude + ')';
+                    el.nextElementSibling.className = 'ok';
+                });
+            } else {
+                el.nextElementSibling.innerHTML = 'Geolocation is not supported in this browser.';
+                el.nextElementSibling.className = 'err';
+            }
+            return false;
+        },
+        requestVideo(el) {
+            if (navigator.mediaDevices) {
+                navigator.mediaDevices.getUserMedia({audio: false, video: true}).then(function (stream) {
+                    el.nextElementSibling.innerHTML = '(Access granted)';
+                });
+            } else {
+                el.nextElementSibling.innerHTML = 'Media devices is not supported in this browser.';
+                el.nextElementSibling.className = 'err';
+            }
+            return false;
+        },
+        requestAudio(el) {
+            if (navigator.mediaDevices) {
+                navigator.mediaDevices.getUserMedia({audio: true, video: false}).then(function (stream) {
+                    el.nextElementSibling.innerHTML = '(Access granted)';
+                    el.nextElementSibling.className = 'ok';
+                });
+            } else {
+                el.nextElementSibling.innerHTML = 'Media devices is not supported in this browser.';
+                el.nextElementSibling.className = 'err';
+            }
+            return false;
+        },
+        requestAudioVideo(el) {
+            if (navigator.mediaDevices) {
+                navigator.mediaDevices.getUserMedia({audio: true, video: true}).then(function (stream) {
+                    el.nextElementSibling.innerHTML = '(Access granted)';
+                    el.nextElementSibling.className = 'ok';
+                });
+            } else {
+                el.nextElementSibling.innerHTML = 'Media devices is not supported in this browser.';
+                el.nextElementSibling.className = 'err';
+            }
+            return false;
+        },
         testClipboard(el) {
             Telegram.WebApp.readTextFromClipboard(function (clipText) {
                 if (clipText === null) {
@@ -516,6 +717,39 @@
                 }
             });
             return false;
+        },
+        requestWriteAccess(el) {
+            Telegram.WebApp.requestWriteAccess(function(allowed) {
+                if (allowed) {
+                    el.nextElementSibling.innerHTML = '(Access granted)'
+                    el.nextElementSibling.className = 'ok'
+                } else {
+                    el.nextElementSibling.innerHTML = '(User declined this request)'
+                    el.nextElementSibling.className = 'err'
+                }
+            })
+        },
+        requestPhoneNumber(el) {
+            Telegram.WebApp.requestContact(function(sent, event) {
+                if (sent) {
+                    el.nextElementSibling.innerHTML = '(Phone number sent to the bot' + (event && event.responseUnsafe && event.responseUnsafe.contact && event.responseUnsafe.contact.phone_number ? ': +' + event.responseUnsafe.contact.phone_number : '') + ')'
+                    el.nextElementSibling.className = 'ok'
+                } else {
+                    el.nextElementSibling.innerHTML = '(User declined this request)'
+                    el.nextElementSibling.className = 'err'
+                }
+            })
+        },
+        requestServerTime(el) {
+            Telegram.WebApp.invokeCustomMethod('getCurrentTime', {}, function(err, time) {
+                if (err) {
+                    el.nextElementSibling.innerHTML = '(' + err + ')'
+                    el.nextElementSibling.className = 'err'
+                } else {
+                    el.nextElementSibling.innerHTML = '(' + (new Date(time * 1000)).toString() + ')'
+                    el.nextElementSibling.className = 'ok'
+                }
+            });
         },
 
         // cloud storage
@@ -598,6 +832,110 @@
                             }
                         });
                     }
+                }
+            });
+        },
+
+        // biometrics
+        biometricInit(el) {
+            const biometricManager = Telegram.WebApp.BiometricManager;
+            if (!DemoApp.biometricInited) {
+                DemoApp.biometricInited = true;
+                Telegram.WebApp.onEvent('biometricManagerUpdated', function() {
+                    document.getElementById('bm_inited').textContent = biometricManager.isInited ? 'true' : 'false'
+                    document.getElementById('bm_available').textContent = biometricManager.isBiometricAvailable ? 'true' : 'false'
+                    document.getElementById('bm_type').textContent = biometricManager.biometricType || ''
+                    document.getElementById('bm_access_requested').textContent = biometricManager.isAccessRequested ? 'true' : 'false'
+                    document.getElementById('bm_access_granted').textContent = biometricManager.isAccessGranted ? 'true' : 'false'
+                    document.getElementById('bm_token_saved').textContent = biometricManager.isBiometricTokenSaved ? 'true' : 'false'
+                    document.getElementById('bm_device_id').textContent = biometricManager.deviceId || ''
+                    document.getElementById('bm_settings').style.display = biometricManager.isBiometricAvailable && biometricManager.isAccessRequested && !biometricManager.isAccessGranted ? 'block' : 'none'
+                });
+            }
+
+            biometricManager.init();
+        },
+        biometricRequestAccess(el) {
+            const biometricManager = Telegram.WebApp.BiometricManager;
+            if (!biometricManager.isInited) {
+                return DemoApp.showAlert('Biometric not inited yet!');
+            }
+
+            biometricManager.requestAccess({reason: 'The bot uses biometrics for testing purposes.'}, function(access_granted) {
+                if (access_granted) {
+                    el.nextElementSibling.innerHTML = '(Access granted)';
+                    el.nextElementSibling.className = 'ok';
+                } else {
+                    el.nextElementSibling.innerHTML = '(Request declined)';
+                    el.nextElementSibling.className = 'err';
+                }
+            });
+        },
+        biometricRequestAuth(el) {
+            const biometricManager = Telegram.WebApp.BiometricManager;
+            if (!biometricManager.isInited) {
+                return DemoApp.showAlert('Biometric not inited yet!');
+            }
+
+            el.nextElementSibling.innerHTML = '';
+            el.nextElementSibling.classList.remove('ok', 'err')
+
+            biometricManager.authenticate({reason: 'The bot requests biometrics for testing purposes.'}, function(success, token) {
+                if (success) {
+                    el.nextElementSibling.innerHTML = '(Success, token: ' + token + ')';
+                    el.nextElementSibling.className = 'ok';
+                } else {
+                    el.nextElementSibling.innerHTML = '(Failed)';
+                    el.nextElementSibling.className = 'err';
+                }
+            });
+        },
+        biometricOpenSettings(el) {
+            const biometricManager = Telegram.WebApp.BiometricManager;
+            if (!biometricManager.isInited) {
+                return DemoApp.showAlert('Biometric not inited yet!');
+            }
+
+            if (!biometricManager.isBiometricAvailable ||
+                !biometricManager.isAccessRequested ||
+                biometricManager.isAccessGranted) {
+                return false;
+            }
+
+            biometricManager.openSettings();
+        },
+        biometricSetToken(el) {
+            const biometricManager = Telegram.WebApp.BiometricManager;
+            if (!biometricManager.isInited) {
+                return DemoApp.showAlert('Biometric not inited yet!');
+            }
+
+            const token = parseInt(Math.random().toString().substring(2)).toString(16);
+            biometricManager.updateBiometricToken(token, function(updated) {
+                if (updated) {
+                    document.getElementById('bm_token_saved').textContent = biometricManager.isBiometricTokenSaved ? 'true' : 'false'
+                    el.nextElementSibling.innerHTML = '(Updated: ' + token + ')'
+                    el.nextElementSibling.className = 'ok'
+                } else {
+                    el.nextElementSibling.innerHTML = '(Failed)'
+                    el.nextElementSibling.className = 'err'
+                }
+            });
+        },
+        biometricRemoveToken(el) {
+            const biometricManager = Telegram.WebApp.BiometricManager;
+            if (!biometricManager.isInited) {
+                return DemoApp.showAlert('Biometric not inited yet!');
+            }
+
+            biometricManager.updateBiometricToken('', function(updated) {
+                if (updated) {
+                    document.getElementById('bm_token_saved').textContent = biometricManager.isBiometricTokenSaved ? 'true' : 'false'
+                    el.nextElementSibling.innerHTML = '(Removed)'
+                    el.nextElementSibling.className = 'ok'
+                } else {
+                    el.nextElementSibling.innerHTML = '(Failed)'
+                    el.nextElementSibling.className = 'err'
                 }
             });
         },
@@ -714,10 +1052,10 @@
     if (DemoApp.initDataUnsafe.query_id) {
         document.getElementById('main_btn').style.display = 'block';
     }
+    document.getElementById('with_webview_btn').style.display = !!DemoApp.initDataUnsafe.query_id && !DemoApp.initDataUnsafe.receiver ? 'block' : 'none';
     document.getElementById('webview_data').innerHTML         = JSON.stringify(DemoApp.initDataUnsafe, null, 2);
 
     document.getElementById('theme_data').innerHTML = JSON.stringify(Telegram.WebApp.themeParams, null, 2);
-    document.getElementById('text_field').focus();
 
     if (DemoApp.initDataUnsafe.receiver) {
         document.getElementById('peer_wrap').style.display = 'block';
@@ -750,6 +1088,12 @@
     Telegram.WebApp.onEvent('viewportChanged', setViewportData);
     setViewportData();
 
+
+    Telegram.WebApp.onEvent('themeChanged', function () {
+        bgColorInput.value = Telegram.WebApp.backgroundColor;
+        document.body.setAttribute('style', '--bg-color:' + Telegram.WebApp.backgroundColor);
+    });
+
     try {
         DemoApp.testClipboard(document.getElementById('clipboard_test'));
     } catch(e) {}
@@ -758,6 +1102,9 @@
         DemoApp.loadCloudKeys();
     } catch(e) {}
 
+    try {
+        DemoApp.biometricInit();
+    } catch(e) {}
 </script>
 
 </body>
