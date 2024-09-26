@@ -71,24 +71,22 @@
     Telegram.WebApp.ready();
     Telegram.WebApp.MainButton.setText('Envoyer').show().onClick(function () {
         const data = JSON.stringify({
-            category: document.getElementById("category").value, 
-            object: document.getElementById("object").value,
-            lastname: document.getElementById("lastname").value,
-            firstname: document.getElementById("firstname").value,
-            nickname: document.getElementById("nickname").value,
-            email: document.getElementById("email").value,
-            phoneNumber: document.getElementById("phoneNumber").value,
-            description: document.getElementById("description").value
+            category: $("#category").val(), 
+            object: $("#object").val(),
+            lastname: $("#lastname").val(),
+            firstname: $("#firstname").val(),
+            nickname: $("#nickname").val(),
+            email: $("#email").val(),
+            phoneNumber: $("#phoneNumber").val(),
+            description: $("#description").val()
         });
         
-        alert($("#claim").serializeObject());
-        Telegram.WebApp.sendData($("#claim").serializeObject());
+        Telegram.WebApp.sendData(data);
         Telegram.WebApp.close();
     });
 
 </script>
 <body style="background-color: #ffffff">
-    <form id="claim" action="javascript:void(0);">
         <label for="category">Votre demande concerne quelle catégorie :</label><br>
         <select name="category">
             <option>Choisir</option>
@@ -120,7 +118,6 @@
 
         <label for="description">Description de la demande:</label><br>
         <textarea id="description" name="description"></textarea><br><br>
-    </form>
 </body>
 <script type="text/javascript">
     Telegram.WebApp.expand();
