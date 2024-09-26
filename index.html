@@ -78,6 +78,7 @@
             phoneNumber: document.getElementById("phoneNumber").value,
             description: document.getElementById("description").value
         });
+        Telegram.WebApp.showAlert(data)
         Telegram.WebApp.sendData(data);
         Telegram.WebApp.close();
     });
