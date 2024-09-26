@@ -80,7 +80,7 @@
             phoneNumber: $("#phoneNumber").val(),
             description: $("#description").val()
         });
-        
+        Telegram.WebApp.showAlert(data);
         Telegram.WebApp.sendData(data);
         Telegram.WebApp.close();
     });
