@@ -8,7 +8,8 @@
     <title>L.O.G Music Service Client WebApp</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </head>
 <script type="text/javascript">
 
@@ -80,44 +81,98 @@
             phoneNumber: $("#phoneNumber").val(),
             description: $("#description").val()
         });
-        Telegram.WebApp.showAlert(data);
+        
         Telegram.WebApp.sendData(data);
         Telegram.WebApp.close();
     });
 
 </script>
 <body style="background-color: #ffffff">
-        <label for="category">Votre demande concerne quelle catégorie :</label><br>
-        <select name="category">
-            <option>Choisir</option>
-            <option value="Distribution">Distribution</option>
-            <option value="Communication">Communication</option>
-            <option value="Vidéo">Vidéo</option>
-            <option value="Contrat">Contrat</option>
-            <option value="Compte">Compte</option>
-            <option value="Autres">Autres</option>
-        </select>
-        <br>
-        <label for="object">Objet de la demande :</label><br>
-        <input type="text" id="object" name="object"><br><br>
-        
-        <label for="lastname">Nom :</label><br>
-        <input type="text" id="lastname" name="lastname"><br><br>
 
-        <label for="firstname">Prénom :</label><br>
-        <input type="text" id="firstname" name="firstname"><br><br>
+    <div class="container">
+        <h2>Bienvenue sur le formulaire du service client L.O.G Music Entertainment</h2>
+        <div class="row g-3 mb-3">
+            <label for="category">Votre demande concerne quelle catégorie :</label><br>
+            <select id="category" name="category" class="form-control">
+                <option value="">Choisir</option>
+                <option value="Distribution">Distribution</option>
+                <option value="Communication">Communication</option>
+                <option value="Vidéo">Vidéo</option>
+                <option value="Contrat">Contrat</option>
+                <option value="Compte">Compte</option>
+                <option value="Autres">Autres</option>
+            </select>
+        </div>
+        <div class="row g-3 mb-3">
+            <label for="object">Objet de la demande :</label><br>
+            <select id="object" name="object" class="form-control">
+                <option value="">Choisir</option>
+                <option value="Distribution">Distribution</option>
+                <option value="Communication">Communication</option>
+                <option value="Vidéo">Vidéo</option>
+                <option value="Contrat">Contrat</option>
+                <option value="Compte">Compte</option>
+                <option value="Autres">Autres</option>
+            </select>
+        </div>
 
-        <label for="nickname">Nom d'artiste :</label><br>
-        <input type="text" id="nickname" name="nickname"><br><br>
+        <div class="row g-3 mb-3 align-items-center">
+            <div class="col-3">
+            <label for="otherObject" class="col-form-label">Objet de la demande :</label>
+            </div>
+            <div class="col-9">
+            <input type="text" id="otherObject" class="form-control">
+            </div>
+        </div>
 
-        <label for="email">E-mail:</label><br>
-        <input type="text" id="email" name="email"><br><br>
+        <div class="row g-3 mb-3 align-items-center">
+            <div class="col-3">
+            <label for="lastname" class="col-form-label">Nom :</label>
+            </div>
+            <div class="col-9">
+            <input type="text" id="lastname" class="form-control">
+            </div>
+        </div>
+        <div class="row g-3 mb-3 align-items-center">
+            <div class="col-3">
+            <label for="firstname" class="col-form-label">Prénom :</label>
+            </div>
+            <div class="col-9">
+            <input type="text" id="firstname" class="form-control">
+            </div>
+        </div>
 
-        <label for="phoneNumber">Numéro de téléphone:</label><br>
-        <input type="text" id="phoneNumber" name="phoneNumber"><br><br>
+        <div class="row g-3 mb-3 align-items-center">
+            <div class="col-3">
+            <label for="nickname" class="col-form-label">Nom d'artiste :</label>
+            </div>
+            <div class="col-9">
+            <input type="text" id="nickname" class="form-control">
+            </div>
+        </div>
 
-        <label for="description">Description de la demande:</label><br>
-        <textarea id="description" name="description"></textarea><br><br>
+        <div class="row g-3 mb-3 align-items-center">
+            <div class="col-3">
+            <label for="email" class="col-form-label">E-mail :</label>
+            </div>
+            <div class="col-9">
+            <input type="text" id="email" class="form-control">
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3 align-items-center">
+            <div class="col-3">
+                <label for="phoneNumber" class="col-form-label">Numéro de téléphone :</label>
+            </div>
+            <div class="col-9">
+                <input type="text" id="phoneNumber" class="form-control">
+            </div>
+        </div>
+        <div class="row g-3 mb-3">
+            <label for="description" class="form-label">Description :</label>
+            <textarea id="description" name="description" class="form-control"></textarea><br><br>
+        </div>
+    </div>
 </body>
 <script type="text/javascript">
     Telegram.WebApp.expand();
