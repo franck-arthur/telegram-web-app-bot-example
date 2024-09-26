@@ -7,6 +7,8 @@
     <meta charset="UTF-8">
     <title>L.O.G Music Service Client WebApp</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
 </head>
 <script type="text/javascript">
 
@@ -78,13 +80,15 @@
             phoneNumber: document.getElementById("phoneNumber").value,
             description: document.getElementById("description").value
         });
-        Telegram.WebApp.showAlert(data)
-        Telegram.WebApp.sendData(data);
+        
+        alert($("#claim").serializeObject());
+        Telegram.WebApp.sendData($("#claim").serializeObject());
         Telegram.WebApp.close();
     });
+
 </script>
 <body style="background-color: #ffffff">
-    <form id="claim">
+    <form id="claim" action="javascript:void(0);">
         <label for="category">Votre demande concerne quelle catégorie :</label><br>
         <select name="category">
             <option>Choisir</option>
