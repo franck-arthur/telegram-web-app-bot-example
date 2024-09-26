@@ -5,33 +5,117 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>python-telegram-bot Example WebApp</title>
+    <title>L.O.G Music Service Client WebApp</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
 </head>
 <script type="text/javascript">
-    const colorPicker = new iro.ColorPicker('#picker', {
-        borderColor: "#ffffff",
-        borderWidth: 1,
-        width: Math.round(document.documentElement.clientWidth / 2),
-    });
-    colorPicker.on('color:change', function (color) {
-        document.body.style.background = color.hexString;
-    });
+
+    const categories = {
+        "categories" : [
+            {
+                "type": "Distribution",
+                "objets" : [
+                    "Attribution référent L.O.G",
+                    "Campagne Spotify Ads",
+                    "Conception cover",
+                    "Création chaine VEVO",
+                    "Création compte TikTok",
+                    "Gestion des lyrics",
+                    "Redistribution (Changement de nom d'artiste / cover)",
+                    "Traitement audio son",
+                    "Vérification copyright (en cas de non validation)"
+                ]
+            },
+            {
+                "type": "Communication",
+                "objets" : [
+                    "Certification comptes plateformes / réseaux (Spotify, Apple, Boomplay, Deezer)",
+                    "Conception charte graphique pour artiste/label",
+                    "Conception pressbook",
+                    "Conception site internet artiste/label",
+                    "Consulting strategie de communication",
+                    "Création fanlink pre-release",
+                    "Création fanlink release",
+                    "Distribution express",
+                    "Mise en avant  Boomplay / Stillac",
+                    "Organisation média tour / réseaux sociaux",
+                    "Publication sur nos pages"
+                ]
+            },
+            {
+                "type": "Vidéo",
+                "objets" : [
+                    "Campagne TikTok Ads",
+                    "Campagne YouTube Ads",
+                    "Création compte YouTube officiel",
+                    "Distribution VEVO"
+                ]
+            },
+            {
+                "type": "Contrat",
+                "objets" : []
+            },
+            {
+                "type": "Compte",
+                "objets" : []
+            },
+            {
+                "type": "Autres",
+                "objets" : []
+            }
+        ]
+    };
 
     Telegram.WebApp.ready();
-    Telegram.WebApp.MainButton.setText('Choose Color').show().onClick(function () {
-        const data = JSON.stringify({hex: colorPicker.color.hexString, rgb: colorPicker.color.rgb});
+    Telegram.WebApp.MainButton.setText('Envoyer').show().onClick(function () {
+        const data = JSON.stringify({
+            category: document.getElementById("category").value, 
+            object: document.getElementById("object").value,
+            lastname: document.getElementById("lastname").value,
+            firstname: document.getElementById("firstname").value,
+            nickname: document.getElementById("nickname").value,
+            email: document.getElementById("email").value,
+            phoneNumber: document.getElementById("phoneNumber").value,
+            description: document.getElementById("description").value
+        });
         Telegram.WebApp.sendData(data);
         Telegram.WebApp.close();
     });
 </script>
 <body style="background-color: #ffffff">
-<div style="position: absolute; margin-top: 5vh; margin-left: 5vw; height: 90vh; width: 90vw; border-radius: 5vh; background-color: var(--tg-theme-bg-color); box-shadow: 0 0 2vw
- #000000;">
-    <div id="picker"
-         style="display: flex; justify-content: center; align-items: center; height: 100%; width: 100%"></div>
-</div>
+    <form id="claim">
+        <label for="category">Votre demande concerne quelle catégorie :</label><br>
+        <select name="category">
+            <option>Choisir</option>
+            <option value="Distribution">Distribution</option>
+            <option value="Communication">Communication</option>
+            <option value="Vidéo">Vidéo</option>
+            <option value="Contrat">Contrat</option>
+            <option value="Compte">Compte</option>
+            <option value="Autres">Autres</option>
+        </select>
+        <br>
+        <label for="object">Objet de la demande :</label><br>
+        <input type="text" id="object" name="object"><br><br>
+        
+        <label for="lastname">Nom :</label><br>
+        <input type="text" id="lastname" name="lastname"><br><br>
+
+        <label for="firstname">Prénom :</label><br>
+        <input type="text" id="firstname" name="firstname"><br><br>
+
+        <label for="nickname">Nom d'artiste :</label><br>
+        <input type="text" id="nickname" name="nickname"><br><br>
+
+        <label for="email">E-mail:</label><br>
+        <input type="text" id="email" name="email"><br><br>
+
+        <label for="phoneNumber">Numéro de téléphone:</label><br>
+        <input type="text" id="phoneNumber" name="phoneNumber"><br><br>
+
+        <label for="description">Description de la demande:</label><br>
+        <textarea id="description" name="description"></textarea><br><br>
+    </form>
 </body>
 <script type="text/javascript">
     Telegram.WebApp.expand();
